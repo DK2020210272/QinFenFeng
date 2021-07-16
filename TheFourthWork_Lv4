@@ -1,0 +1,303 @@
+import java.io.*;
+import java.util.LinkedList;
+
+class District {
+    private String name;
+    private double longtitude;          //经度
+    private double latitude;            //纬度
+    private float radius;               //半径
+
+    public String getName() {
+        return name;
+    }
+
+    public double getLongtitude() {
+        return longtitude;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public float getRadius() {
+        return radius;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setLongtitude(double longtitude) {
+        this.longtitude = longtitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public void setRadius(float radius) {
+        this.radius = radius;
+    }
+}
+
+class Taxi {
+    private StringBuffer flagcar, thing, tense, time,  longtitude, latitude,pos1, pos2, gpstense;//车辆标识,触发事件,运营状态,gps时间,gps维度,gps经度,gps方位,gps方位,gps状态
+
+    public StringBuffer getFlagcar() {
+        return flagcar;
+    }
+
+    public StringBuffer getThing() {
+        return thing;
+    }
+
+    public StringBuffer getTense() {
+        return tense;
+    }
+
+    public StringBuffer getTime() {
+        return time;
+    }
+
+    public StringBuffer getLongtitude() {
+        return longtitude;
+    }
+
+    public StringBuffer getLatitude() {
+        return latitude;
+    }
+
+
+
+    public StringBuffer getPos1() {
+        return pos1;
+    }
+
+    public StringBuffer getPos2() {
+        return pos2;
+    }
+
+    public StringBuffer getGpstense() {
+        return gpstense;
+    }
+
+    public void setFlagcar(StringBuffer flagcar) {
+        this.flagcar = flagcar;
+    }
+
+    public void setThing(StringBuffer thing) {
+        this.thing = thing;
+    }
+
+    public void setTense(StringBuffer tense) {
+        this.tense = tense;
+    }
+
+    public void setTime(StringBuffer time) {
+        this.time = time;
+    }
+
+    public void setLongtitude(StringBuffer longtitude) {
+        this.longtitude = longtitude;
+    }
+
+    public void setLatitude(StringBuffer latitude) {
+        this.latitude = latitude;
+    }
+
+
+
+    public void setPos1(StringBuffer pos1) {
+        this.pos1 = pos1;
+    }
+
+    public void setPos2(StringBuffer pos2) {
+        this.pos2 = pos2;
+    }
+
+    public void setGpstense(StringBuffer gpstense) {
+        this.gpstense = gpstense;
+    }
+}
+
+public class TheForth_Homework {
+    public static int flag;
+    public static void main(String[] args) throws Exception {
+        int sum=0;
+        int count=0;
+        double distenceP=0;
+        District[] district=DistrictRead();
+        LinkedList<Taxi> Taxis = Taxi_gsp();
+        for(int i =0 ;i<7;i++){
+            count=0;
+            for(int j=0;j<flag/9;j++){
+                distenceP=Math.pow((district[i].getLongtitude()-Double.valueOf(Taxis.get(j).getLongtitude().toString()))*111,2)+Math.pow((district[i].getLatitude()-Double.valueOf(Taxis.get(j).getLatitude().toString()))*111,2);
+                if(distenceP<=Math.pow(district[i].getRadius(),2)){
+                    count++;
+                }
+            }
+            System.out.println(district[i].getName()+"有"+count+"辆车");
+            sum+=count;
+        }
+        System.out.println("总共有"+sum+"辆车");
+    }
+
+    public static District[] DistrictRead() throws Exception {
+        File f = new File("d:" + File.separator + "district.txt");
+        Reader reader = new FileReader(f);
+
+        District[] district = new District[7];
+        for (int n = 0; n < 7; n++) {
+            district[n] = new District();
+        }
+        int i = 0;
+        int len = 0;
+        int temp = 0;
+        char ch;
+        char[] c = new char[24];
+        temp = reader.read();
+        while (true) {
+            ch = (char) temp;
+            //获得姓名
+            while (ch != ',') {
+                c[i++] = ch;
+                temp = reader.read();
+                ch = (char) temp;
+            }
+            district[len].setName(new String(c, 0, i));
+            c = new char[24];
+            i = 0;
+            //获得经度
+            temp = reader.read();
+            ch = (char) temp;
+            while (ch != ',') {
+                c[i++] = ch;
+                temp = reader.read();
+                ch = (char) temp;
+            }
+            district[len].setLongtitude(Double.valueOf(new String(c, 0, i)));
+            c = new char[24];
+            i = 0;
+            //获得纬度
+            temp = reader.read();
+            ch = (char) temp;
+            while (ch != ',') {
+                c[i++] = ch;
+                temp = reader.read();
+                ch = (char) temp;
+            }
+            district[len].setLatitude(Double.valueOf(new String(c, 0, i)));
+            c = new char[24];
+            i = 0;
+            //获得半径
+            temp = reader.read();
+            ch = (char) temp;
+            while (ch != '\n') {
+                c[i++] = ch;
+                temp = reader.read();
+                if (temp == -1) break;
+                ch = (char) temp;
+            }
+            district[len].setRadius(Float.valueOf(new String(c, 0, i)));
+            c = new char[24];
+            i = 0;
+
+            len++;
+            if (temp == -1) break;
+
+            temp = reader.read();
+        }
+        reader.close();
+        return district;
+    }
+
+    public static LinkedList<Taxi> Taxi_gsp() throws Exception {
+        int temp = 0;
+        Taxi taxi = new Taxi();
+        flag=0;
+
+        File f = new File("d:" + File.separator + "taxi_gps.txt");
+        Reader taxi_input = new FileReader(f);
+        LinkedList<Taxi> taxis = new LinkedList<>();
+        taxi = new Taxi();
+        taxi.setFlagcar(new StringBuffer());
+        taxi.setThing(new StringBuffer());
+        taxi.setTense(new StringBuffer());
+        taxi.setTime(new StringBuffer());
+        taxi.setLatitude(new StringBuffer());
+        taxi.setLongtitude(new StringBuffer());
+        taxi.setPos1(new StringBuffer());
+        taxi.setPos2(new StringBuffer());
+        taxi.setGpstense(new StringBuffer());
+        taxis.add(taxi);
+        do {
+            temp = taxi_input.read();
+            if (temp == ',' || (temp == '\n')) {
+                flag++;
+            }
+            switch (flag % 9) {
+                case 0:
+                    if(temp=='\n'){
+                        taxi = new Taxi();
+                        taxi.setFlagcar(new StringBuffer());
+                        taxi.setThing(new StringBuffer());
+                        taxi.setTense(new StringBuffer());
+                        taxi.setTime(new StringBuffer());
+                        taxi.setLatitude(new StringBuffer());
+                        taxi.setLongtitude(new StringBuffer());
+                        taxi.setPos1(new StringBuffer());
+                        taxi.setPos2(new StringBuffer());
+                        taxi.setGpstense(new StringBuffer());
+                        taxis.add(taxi);
+                    }
+                    if(temp!=','){
+                        //taxis.get(flag / 9)getFlagcar().append(temp);
+                    }
+                case 1:
+                    if(temp!=','){
+                        //taxis.get(flag / 9).getThing().append(temp);
+                    }
+                    break;
+                case 2:
+                    if(temp!=','){
+                        //taxis.get(flag / 9).getTense().append(temp);
+                    }
+                    break;
+                case 3:
+                    if(temp!=','){
+                        //taxis.get(flag / 9).getTime().append(temp);
+                    }
+                    break;
+                case 4:
+                    if(temp!=','){
+                        taxis.get(flag / 9).getLongtitude().append(String.valueOf((char)temp));
+                    }
+                    break;
+                case 5:
+                    if(temp!=','){
+                        taxis.get(flag / 9).getLatitude().append(String.valueOf((char)temp));
+                    }
+                    break;
+                case 6:
+                    if(temp!=','){
+                        //taxis.get(flag / 9).getPos1().append(temp);
+                    }
+                    break;
+                case 7:
+                    if(temp!=','){
+                        //taxis.get(flag / 9).getPos2().append(temp);
+                    }
+                    break;
+                case 8:
+                    if(temp!=','){
+                        //taxis.get(flag / 9).getGpstense().append(temp);
+                    }
+                    break;
+                default:
+                    System.out.println("出错！");
+                    break;
+            }
+        } while (temp != -1);
+        return taxis;
+    }
+}
